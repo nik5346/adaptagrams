@@ -1273,7 +1273,7 @@ void AStarPathPrivate::search(ConnRef *lineRef, VertInf *src, VertInf *tar, Vert
         // Check adjacent points in graph and add them to the queue.
         EdgeInfList& visList = (!isOrthogonal) ?
                 bestNodeInf->visList : bestNodeInf->orthogVisList;
-        if (isOrthogonal)
+        if (isOrthogonal && !visList.empty())
         {
             // We would like to explore in a structured way, 
             // so sort the points in the visList...

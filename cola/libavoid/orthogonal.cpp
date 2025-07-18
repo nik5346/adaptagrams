@@ -1339,15 +1339,14 @@ static void intersectSegments(Router *router, SegmentList& segments,
             if (inVertSegRegion)
             {
                 // Add horizontal visibility segment.
-                VertSet intersectionVerts =
+                const VertSet& intersectionVerts =
                         horiLine.addEdgeHorizontalTillIntersection(
                             router, vertLine);
 
-                for (VertSet::iterator v = intersectionVerts.begin();
-                        v != intersectionVerts.end(); ++v)
+                for (const auto& v : intersectionVerts)
                 {
-                    vertLine.breakPoints.insert(PosVertInf(horiLine.pos, *v,
-                            getPosVertInfDirections(*v, YDIM)));
+                    vertLine.breakPoints.insert(PosVertInf(horiLine.pos, v,
+                            getPosVertInfDirections(v, YDIM)));
                 }
             }
         }

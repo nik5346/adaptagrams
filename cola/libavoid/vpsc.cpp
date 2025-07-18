@@ -966,17 +966,17 @@ double Block::compute_dfdv(Variable* const v, Variable* const u,
 }
 double Block::compute_dfdv(Variable* const v, Variable* const u) {
     double dfdv = v->dfdv();
-    for(Cit it = v->out.begin(); it != v->out.end(); ++it) {
-        Constraint *c = *it;
+    for (const auto& c : v->out) {
         if(canFollowRight(c,u)) {
-            c->lm =   compute_dfdv(c->right,v);
-            dfdv += c->lm * c->left->scale;
+            double lm = compute_dfdv(c->right, v);
+            c->lm = lm;
+            dfdv += lm * c->left->scale;
         }
     }
-    for(Cit it=v->in.begin();it!=v->in.end();++it) {
-        Constraint *c = *it;
+    for (const auto& c : v->in) {
         if(canFollowLeft(c,u)) {
-            c->lm = - compute_dfdv(c->left,v);
+            double lm = compute_dfdv(c->left, v);
+            c->lm = -lm;
             dfdv -= c->lm * c->right->scale;
         }
     }
@@ -1091,15 +1091,13 @@ Block::Pair Block::compute_dfdv_between(
 // traversing active constraint tree starting from v,
 // not back tracking over u
 void Block::reset_active_lm(Variable* const v, Variable* const u) {
-    for(Cit it=v->out.begin();it!=v->out.end();++it) {
-        Constraint *c=*it;
+    for(const auto& c : v->out) {
         if(canFollowRight(c,u)) {
             c->lm=0;
             reset_active_lm(c->right,v);
         }
     }
-    for(Cit it=v->in.begin();it!=v->in.end();++it) {
-        Constraint *c=*it;
+    for(const auto& c : v->in) {
         if(canFollowLeft(c,u)) {
             c->lm=0;
             reset_active_lm(c->left,v);
@@ -1183,18 +1181,18 @@ void Block::populateSplitBlock(Block *b, Variable* v, Variable const* u) {
 bool Block::getActivePathBetween(Constraints& path, Variable const* u,
                Variable const* v, Variable const *w) const {
     if(u==v) return true;
-    for (Cit_const c=u->in.begin();c!=u->in.end();++c) {
-        if (canFollowLeft(*c,w)) {
-            if(getActivePathBetween(path, (*c)->left, v, u)) {
-                path.push_back(*c);
+    for (const auto& c : u->in) {
+        if (canFollowLeft(c,w)) {
+            if(getActivePathBetween(path, c->left, v, u)) {
+                path.push_back(c);
                 return true;
             }
         }
     }
-    for (Cit_const c=u->out.begin();c!=u->out.end();++c) {
-        if (canFollowRight(*c,w)) {
-            if(getActivePathBetween(path, (*c)->right, v, u)) {
-                path.push_back(*c);
+    for (const auto& c : u->out) {
+        if (canFollowRight(c,w)) {
+            if(getActivePathBetween(path, c->right, v, u)) {
+                path.push_back(c);
                 return true;
             }
         }

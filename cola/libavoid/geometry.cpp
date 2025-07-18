@@ -107,18 +107,24 @@ bool colinear(const Point& a, const Point& b, const Point& c,
 bool pointOnLine(const Point& a, const Point& b, const Point& c, 
         const double tolerance)
 {
-    // Do this a bit more optimally for orthogonal AB line segments.
-    if (a.x == b.x)
+    // Cache values to avoid repeated member access
+    const double ax = a.x, ay = a.y, bx = b.x, by = b.y, cx = c.x, cy = c.y;
+
+    // Quick rejection for vertical lines
+    if (ax == bx)
     {
-        return (a.x == c.x) &&
-                (((a.y < c.y) && (c.y < b.y)) ||
-                 ((b.y < c.y) && (c.y < a.y)));
+        if (ax != cx) 
+            return false;
+        // Use <= for inclusive check, and avoid std::min/max
+        return ((cy > ay && cy < by) || (cy > by && cy < ay));
     }
-    else if (a.y == b.y)
+
+    // Quick rejection for horizontal lines
+    if (ay == by)
     {
-        return (a.y == c.y) &&
-                (((a.x < c.x) && (c.x < b.x)) ||
-                 ((b.x < c.x) && (c.x < a.x)));
+        if (ay != cy) 
+            return false;
+        return ((cx > ax && cx < bx) || (cx > bx && cx < ax));
     }
 
     // Or use the general case.
