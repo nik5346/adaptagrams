@@ -1,6 +1,12 @@
 #include "libavoid/libavoid.h"
+
+#include <chrono>
+#include <iostream>
+
 using namespace Avoid;
 int main(void) {
+    auto start = std::chrono::high_resolution_clock::now();
+
     Router *router = new Router(OrthogonalRouting);
     router->setRoutingParameter((RoutingParameter)0, 50);
     router->setRoutingParameter((RoutingParameter)1, 0);
@@ -7661,5 +7667,10 @@ int main(void) {
     router->processTransaction();
     router->outputDiagram("output/performance01");
     delete router;
+
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = duration_cast<std::chrono::microseconds>(stop - start);
+    std::cout << "Duration: " << duration.count() << " microseconds" << std::endl;
+
     return 0;
 };
